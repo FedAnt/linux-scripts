@@ -10,8 +10,8 @@ cd $find_str
 # Пробегаемся по всем почтовым ящикам
 for i in `find ${find_str} -maxdepth 1 -type d`
 do
-    # Исключить папку zzadmin
-    if [ $i == "${find_str}/zzadmin" ]; then continue; fi;
+    # Исключить папку info
+    if [ $i == "${find_str}/info" ]; then continue; fi;
     echo -e "$i"
     # Пробегаем по подпапкам
     for m in ${subfolders[*]}; do
