@@ -3,8 +3,8 @@
 host=$(hostname -s);
 backuppath=/backup/$host;
 backuppathremote=/mnt/backup/$host;
-backupuser=backup
-backupgroup=backup
+user_backup=backup;
+grp_backup=backup;
 
 mailto=MonitoringBackup@somedomain.local;
 mailfrom=$host@somedomain.local;
@@ -34,9 +34,10 @@ prepare_local()
 
  # Создаём новые директории
  mkdir -p $backuppath/ext4 > /dev/null;
- chown -R $backupuser:$backupgroup $backuppath/ext4;
+ chown -R $user_backup:$grp_backup $backuppath/ext4;
  chmod -R 770 $backuppath/ext4;
 }
+
 
 # Подготовка к резервному копированию на удаленный сервер
 prepare_remote()
@@ -59,7 +60,7 @@ prepare_remote()
  else
   # Создаём новые директории
   mkdir -p $backuppathremote/old/ext4 > /dev/null;
-  chown -R $backupuser:$backupgroup $backuppathremote/old/ext4;
+  chown -R $user_backup:$grp_backup $backuppathremote/old/ext4;
   chmod 770 $backuppathremote/old/ext4;
  fi;
 
@@ -67,16 +68,14 @@ prepare_remote()
 
  # Создаём новые директории
  mkdir -p $backuppathremote/current/ext4 > /dev/null;
- chown -R $backupuser:$backupgroup $backuppathremote/current/ext4;
+ chown -R $user_backup:$grp_backup $backuppathremote/current/ext4;
  chmod 770 $backuppathremote/current/ext4;
 }
+
 
 # Резервное копирование
 backup()
 {
- # Информация: Разархивировать архив в диреторию /tmp
- # tar xfz test.tgz -С /tmp
-
  # Исключаем из резервного копирования директории
  for exclide_dir in /backup /cache /export /proc /dev /tmp /sys /stats /mnt; do
   exclude_ops="$exclude_ops --exclude=$exclide_dir/*";
@@ -89,11 +88,9 @@ backup()
  tar cfpP - /mail | pigz -c > $backuppath/ext4/mail_$curdatetime.tgz 2>>$backuperr;
  # mysql
  tar cfpP - /mysql | pigz -c > $backuppath/ext4/mysql_$curdatetime.tgz 2>>$backuperr;
- # dspam
-# tar cfpP - /dspam | pigz -c > $backuppath/ext4/dspam_$curdatetime.tgz 2>>$backuperr;
 
  # Устанавливаем права на резервную копию
- chown $backupuser:$backupgroup $backuppath/ext4/*_$curdatetime.tgz;
+ chown $user_backup:$grp_backup $backuppath/ext4/*_$curdatetime.tgz;
  chmod 640 $backuppath/ext4/*_$curdatetime.tgz;
 
  # Вставляем журнал в письмо
