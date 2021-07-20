@@ -29,7 +29,7 @@ prepare()
 get()
 {
   # проверка доступности удаленного сервера
-  su - backup -c "ssh -p $remoteport backup@$remotehost test -d /backup/mysql/" >> $mailmsg 2>&1;
+  su - backup -c "ssh -p $remoteport $user_backup@$remotehost test -d /backup/mysql/" >> $mailmsg 2>&1;
   if [ $? -eq 255 ]; then
     echo "Error while accessing to the $remotehost" >> $mailmsg;
     error=1;
@@ -37,7 +37,7 @@ get()
     # vds mysql backup
     echo "$(date '+%Y%m%d_%H%M%S') Start copying mysql" >> $mailmsg;
     # Fixme: Files for copy. Check name and size
-    su - $user_backup -c "scp -P $remoteport -r -p -c blowfish backup@$remotehost:/backup/mysql/current/* $backuppath/current/mysql/" >> $mailmsg 2>&1;
+    su - $user_backup -c "scp -P $remoteport -r -p -c blowfish $user_backup@$remotehost:/backup/mysql/current/* $backuppath/current/mysql/" >> $mailmsg 2>&1;
     chmod o+r $backuppath/current/mysql/*;
     echo "$(date '+%Y%m%d_%H%M%S') Result of copying mysql=$?" >> $mailmsg;
 
@@ -45,20 +45,20 @@ get()
 
     # vds os & webroot backup
     echo "$(date '+%Y%m%d_%H%M%S') Start copying os & webroot" >> $mailmsg;
-    su - $user_backup -c "scp -P $remoteport -r -p -c blowfish backup@$remotehost:/backup/xfs/current/* $backuppath/current/xfs/" >> $mailmsg 2>&1;
+    su - $user_backup -c "scp -P $remoteport -r -p -c blowfish $user_backup@$remotehost:/backup/xfs/current/* $backuppath/current/xfs/" >> $mailmsg 2>&1;
     chmod o+r $backuppath/current/xfs/*;
     echo "$(date '+%Y%m%d_%H%M%S') Result of copying os & webroot=$?" >> $mailmsg;
 
     # md5sum
     # Fixme: find last files
     echo "$(date '+%Y%m%d_%H%M%S') Start copying md5sum" >> $mailmsg;
-    su - $user_backup -c "scp -P $remoteport -r -p -c blowfish backup@$remotehost:/stats/md5sum/md5sum_${curdate}* $backuppath/md5sum/" >> $mailmsg 2>&1;
+    su - $user_backup -c "scp -P $remoteport -r -p -c blowfish $user_backup@$remotehost:/stats/md5sum/md5sum_${curdate}* $backuppath/md5sum/" >> $mailmsg 2>&1;
     chmod o+r $backuppath/current/md5sum/*;
     echo "$(date '+%Y%m%d_%H%M%S') Result of copying md5sum=$?" >> $mailmsg;
 
     # logs
     echo "$(date '+%Y%m%d_%H%M%S') Start copying logs" >> $mailmsg;
-    su - $user_backup -c "scp -P $remoteport -r -p -c blowfish backup@$remotehost:/stats/log/*-${curdate}* $backuppath/log/" >> $mailmsg 2>&1;
+    su - $user_backup -c "scp -P $remoteport -r -p -c blowfish $user_backup@$remotehost:/stats/log/*-${curdate}* $backuppath/log/" >> $mailmsg 2>&1;
     chmod o+r $backuppath/current/log/*;
     echo "$(date '+%Y%m%d_%H%M%S') Result of copying logs=$?" >> $mailmsg;
   fi;
