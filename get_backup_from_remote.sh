@@ -81,4 +81,3 @@ echo "$(date '+%Y%m%d_%H%M%S') End getting data from $remotehost" >> $mailmsg;
 /usr/sbin/sendmail.postfix -oi -f $mailfrom $mailto < $mailmsg;
 
 #rm $mailmsg
-
